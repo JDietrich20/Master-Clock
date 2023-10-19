@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <script src = "https://cdn.jsdelivr.net/npm/three@0.101.1/build/three.min.js"></script>
+        <script src = "https://cdn.jsdelivr.net/npm/three@0.101.1/examples/js/controls/OrbitControls.js"></script>
+    
+        <script>
+            window.onload = clock
+
+            let renderer, scene, camera
+            var tiktok = true, z = 0;
+            var clockNum = []
+            let minref, secondref, hourref;
+            //var texture = new THREE.TextureLoader().7i
+            
+            
+            function clock()
+            {
+                //renderer
+                renderer = new THREE.WebGLRenderer()
+                renderer.setSize(800,800)
+                renderer.shadowMap.enabled = true;
+                renderer.shadowMap.type = THREE.BasicShadowMap;
+                document.body.appendChild(renderer.domElement)
+
+                
+
+                //scene 
+                scene = new THREE.Scene()
+
+                
+                    //glass plane
+                        let glass = new THREE.Mesh(new THREE.BoxGeometry(1.1, 3.1, 0.02), new THREE.MeshPhysicalMaterial({roughness: 0, metalness: 0, transmission: 1, transparent: true, opacity: 0.4}))
+                        //color: "white", transparent: true, opacity: 0.4
+                        glass.position.z = 0.15
+                        scene.add(glass)
+
+                    //clock numbers
+                        angle = Math.PI/4
+                        facebase = new THREE.Scene()
+
+                        for(var i = 0; i <=12 ; i++){
+                            clockNum[i] = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.1, 0.07), new THREE.MeshPhongMaterial({color:"gray"}))
+                            clockNum[i].position.x = (-.33) * Math.sin(Math.PI/6 * i);
+                            clockNum[i].position.y = (-.33) * Math.cos(Math.PI/6 * i);
+                            clockNum[i].rotateZ(-Math.PI/6 * i)
+                            facebase.add(clockNum[i])
+                        }
+                       
+                        
+                  
+
+                    
+                    facebase.position.z = 0.22
+                    facebase.position.y = 1.0
+                    scene.add(facebase)
+
+            
+                    //clock
+                        let clock = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.08, 1000, 8, false, 0, Math.PI * 2), new THREE.MeshPhongMaterial({color:"#D3D3D3"}))
+                        clock.position.y = 1
+                        clock.rotation.x = Math.PI /2
+                        clock.position.z = glass.position.z + 0.08/2
+                        clock.receiveShadow = true;
+                        clock.castShadow = true;
+                        scene.add(clock)
+
+                    //clockFace
+                        let clockFace = new THREE.Mesh(new THREE.CircleGeometry(0.40, 1000, 0, Math.PI * 2), new THREE.MeshPhongMaterial({color:"white"}))
+                        clockFace.position.y = 1
+                        clockFace.position.z = glass.position.z + 0.09
+                        scene.add(clockFace)
+
+
+                        swing = new THREE.Scene()
+                        fixedSwing = new THREE.Scene()
+                        //string 
+                            let string = new THREE.Mesh(new THREE.BoxGeometry(0.02, 1.5, 0.02), new THREE.MeshPhongMaterial({color: "gray"}))
+                            string.position.z = clockFace.position.z - 0.04
+                            string.position.y = -0.1
+                            string.receiveShadow = true;
+                            string.castShadow = true;
+                            swing.add(string)
+
+                        //pendulum
+                            let pendulum = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.30, 0.06), new THREE.MeshPhongMaterial({color: "gray"}))
+                            pendulum.position.z = clockFace.position.z - 0.04
+                            pendulum.position.y = -0.9
+                            pendulum.receiveShadow = true;
+                            pendulum.castShadow = true;
+                            swing.add(pendulum)
+                            swing.translateY(-0.6)
+                            swing.receiveShadow = true;
+                            swing.castShadow = true;
+                            fixedSwing.add(swing)
+                            fixedSwing.translateY(0.6)
+                            fixedSwing.rotation.z = -0.34
+
+                            fixedSwing.receiveShadow = true;
+                            fixedSwing.castShadow = true;
+
+                            scene.add(fixedSwing)
+
+
+                    //back board
+                        let board = new THREE.Mesh(new THREE.BoxGeometry(1.1, 3.1, 0.05), new THREE.MeshPhongMaterial({color:"gray"}))
+                        board.position.z = -0.04
+                        board.receiveShadow = true;
+                        board.castShadow = true;
+                        scene.add(board)
+
+
+                    
+                    //TL screw
+                        let tl = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.3, 1000, 8, false, 0, Math.PI * 2), new THREE.MeshPhongMaterial({color:"#D3D3D3"}))
+                        tl.position.y = 1.47
+                        tl.position.x = 0.5
+                        tl.rotation.x = Math.PI /2
+                        tl.position.z = 0.09
+                        tl.receiveShadow = true;
+                        tl.castShadow = true;
+                        scene.add(tl)
+
+                    //TR screw
+                        let tr = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.25, 1000, 8, false, 0, Math.PI * 2), new THREE.MeshPhongMaterial({color:"#D3D3D3"}))
+                        tr.position.y = 1.47
+                        tr.position.x = -0.5
+                        tr.rotation.x = Math.PI /2
+                        tr.position.z = 0.09
+                        tr.receiveShadow = true;
+                        tr.castShadow = true;
+                        scene.add(tr)
+                        
+                    //BR screw
+                        let br = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.3, 1000, 8, false, 0, Math.PI * 2), new THREE.MeshPhongMaterial({color:"#D3D3D3"}))
+                        br.position.y = -1.45
+                        br.position.x = 0.5
+                        br.rotation.x = Math.PI /2
+                        br.position.z = 0.09
+                        br.receiveShadow = true;
+                        br.castShadow = true;
+                        scene.add(br)
+
+                    //BL screw 
+                        let bl = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.3, 1000, 8, false, 0, Math.PI * 2), new THREE.MeshPhongMaterial({color:"#D3D3D3"}))
+                        bl.position.y = -1.45
+                        bl.position.x = -0.5
+                        bl.rotation.x = Math.PI /2
+                        bl.position.z = 0.09
+                        bl.receiveShadow = true;
+                        bl.castShadow = true;
+                        scene.add(bl)
+
+                    //base
+                        let base = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.36, 0.5), new THREE.MeshPhongMaterial({color: "#A9A9A9"}))
+                        base.position.y = -1.70
+                        base.position.z = 0.13
+                        base.receiveShadow = true;
+                        base.castShadow = true;
+                        scene.add(base)
+
+                    //floor
+                        let floor = new THREE.Mesh(new THREE.PlaneGeometry(10,10, 32), new THREE.MeshPhongMaterial({color: "#A9A9A9", side: THREE.DoubleSide}))
+                        floor.position.y = -1.88999
+                        floor.rotation.x = Math.PI/2
+                        floor.receiveShadow = true;
+                    
+                        scene.add(floor)
+
+
+                    //clock hands (creation of the clock hands and setting it all pointing at 12 hand)
+                        let minuteHand = new THREE.Mesh(new THREE.BoxGeometry(0.3,0.01,0.025), new THREE.MeshPhongMaterial({color:0x000000}))
+                        minuteHand.rotateZ(Math.PI/2);
+                        minuteHand.position.set(0,0.15,0);
+                        
+
+                        let hourHand = new THREE.Mesh(new THREE.BoxGeometry(0.2,0.01,0.025), new THREE.MeshPhongMaterial({color:0x000000}))
+                        hourHand.rotateZ(Math.PI/2);
+                        hourHand.position.set(0,0.1,0);
+                        
+                        
+
+                        let secondHand = new THREE.Mesh(new THREE.BoxGeometry(0.35,0.01,0.025), new THREE.MeshPhongMaterial({color:0xff0000}))
+                        secondHand.rotateZ(Math.PI/2);
+                        secondHand.position.set(0,0.15,0);
+
+
+                    //references for rotation around a certain object, in this case it is clockFace (in the three.js slides)
+                        minref = new THREE.Object3D();
+                        hourref = new THREE.Object3D();
+                        secondref = new THREE.Object3D();
+
+                        clockFace.add(secondref);
+                        clockFace.add(hourref);
+                        clockFace.add(minref);
+                        minref.add(minuteHand)
+                        secondref.add(secondHand);
+                        hourref.add(hourHand);
+                        
+
+                    
+                //camera
+                camera = new THREE.PerspectiveCamera(30, 1, 0.1, 1000)
+                camera.position.set(0,0,10)
+                camera.lookAt(scene.position)
+
+                controls = new THREE.OrbitControls(camera, renderer.domElement)
+
+                // const light = new THREE.DirectionalLight(0x404040, 1);
+                // light.position.set(1,0,0)
+                // scene.add(light)
+
+                 //light
+                 const ambient = new THREE.AmbientLight(0xffffff, 0.5)
+                    scene.add(ambient);
+                    const point = new THREE.PointLight(0xffffff, 0.8, 18)
+                    point.position.set(3,5,3)
+                    point.shadow.mapSize.width = 3000;
+                    point.shadow.mapSize.height = 3000;
+                    point.castShadow = true;
+                    point.shadow.camera.near = 0.1
+                    point.shadow.camera.far = 25
+                    scene.add(point)
+
+               
+
+                generate()
+            }
+
+            function generate()
+            {
+                requestAnimationFrame(generate)
+                controls.update()
+            
+                // fixedSwing.rotation.z += 1
+                // fixedSwing.rotation.z = Math.round(fixedSwing.rotation.z)
+                // alert(fixedSwing.rotation.z)
+
+                
+                if(tiktok) 
+                {
+                    fixedSwing.rotation.z += (0.005*z)
+                    z += 0.123
+                    if(z >= 4) tiktok = false; 
+                }
+                else
+                {
+                    fixedSwing.rotation.z -= (-0.005*z)
+                    z -= 0.123
+                    if(z <= -4) tiktok = true;
+                }
+
+                //animation of the clock hands (reference to the 2D Clock example and it rotates with the animation phase)
+                  var currentTime = new Date();
+                    var minute = currentTime.getMinutes();
+                    
+                    var second = currentTime.getSeconds();
+
+                    var hour = currentTime.getHours();
+                    hour = hour%12;
+                    var mseconds = currentTime.getMilliseconds();
+                if(secondref){
+                    secondref.rotation.z = -(second + mseconds/1000) * Math.PI/30;
+                }
+
+                if(hourref){
+                    hourref.rotation.z = -((hour*Math.PI/6)+(minute*Math.PI/(6*60))+(second*Math.PI/(360*60)))
+                }
+
+                if(minref){
+                    minref.rotation.z = -((minute*Math.PI/30)+(second*Math.PI/(30*60)));
+                }
+
+                
+
+                console.log(second);
+
+                renderer.setClearColor("black")
+                renderer.render(scene, camera)
+            }
+        </script>
+    </body>
+</html>
